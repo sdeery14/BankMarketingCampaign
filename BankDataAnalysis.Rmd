@@ -1,0 +1,318 @@
+---
+title: "Sean_Deery_HW3"
+author: "Sean Deery"
+date: "2023-04-30"
+output: pdf_document
+---
+
+# Reading in the data
+
+```{r}
+# Read in the data
+bank <- read.csv("bankdata_csv_all.csv", na.string=c(""))
+# Show the structure
+str(bank)
+```
+
+# Data Cleaning
+
+```{r}
+# Remove the 'id' variable
+bank <- bank[,-1]
+str(bank)
+```
+
+## Data Types
+```{r}
+# Convert children to ordinal
+bank$children <- ordered(bank$children)
+
+# Convert character variables to factors
+bank$sex <- factor(bank$sex)
+bank$region <- factor(bank$region)
+bank$married <- factor(bank$married)
+bank$car <- factor(bank$car)
+bank$save_act <- factor(bank$save_act)
+bank$current_act <- factor(bank$current_act)
+bank$mortgage <- factor(bank$mortgage)
+bank$pep <- factor(bank$pep)
+```
+
+
+```{r}
+# Get the range of values for age and income to discretize
+summary(bank$age)
+summary(bank$income)
+```
+```{r}
+# Discretize age and income
+bank$age <- cut(bank$age, breaks = c(0,20,30,40,50,60, 70), 
+                labels = c("teens", "twenties", "thirties", "forties", "fifties", "sixties"),
+                right=FALSE)
+# Show a table of the new age values
+table(bank$age)
+```
+
+```{r}
+# Discretize ncome
+bank$income <- cut(bank$income, breaks = c(0, 10000, 20000, 30000, 40000, 50000, 60000, 70000), 
+                   labels = c("0-9,999", "10,000-19,999", "20,000-29,999", "30,000-39,999", "40,000-49,999", "50,000-59,999", "60,000-69,999"),
+                   right = FALSE)
+# Show a table of the new income values
+table(bank$income)
+```
+
+```{r}
+# Check the data types
+str(bank)
+```
+
+
+
+## Missing Data
+```{r}
+# Check how many missing values there are
+sum(is.na(bank))
+```
+
+# EDA and Data Viz
+
+```{r}
+# Load ggplot2
+library(ggplot2)
+# Load tidyverse
+library(tidyverse)
+```
+
+
+Age
+
+```{r}
+# Get a summary of ages
+summary(bank$age)
+# Get percentages for each category
+summary(bank$age)/sum(summary(bank$age))
+# Create a barplot of customer ages
+bank %>% ggplot(aes(x=age)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Ages") + xlab("Age") + ylab("Count") + theme(plot.title = element_text(hjust=0.5))
+# Create a bar chart of customer ages separated by whether they bought a PEP
+bank %>% ggplot(aes(x=age, fill=pep)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Ages") + xlab("Age") + ylab("Count") + theme(plot.title = element_text(hjust=0.5))
+```
+
+Sex
+
+```{r}
+# Get a summary of customer sex
+summary(bank$sex)
+# Get percentages for each category
+summary(bank$sex)/sum(summary(bank$sex))
+# Create a barplot of customer sex
+bank %>% ggplot(aes(x=sex)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Sex") + xlab("Sex") + ylab("Count") + theme(plot.title = element_text(hjust=0.5))
+# Create a bar chart of customer sex separated by whether they bought a PEP
+bank %>% ggplot(aes(x=sex, fill=pep)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Sex") + xlab("Sex") + ylab("Count") + theme(plot.title = element_text(hjust=0.5))
+```
+
+Region
+```{r}
+# Get a summary of customer region
+summary(bank$region)
+# Get percentages for each category
+summary(bank$region)/sum(summary(bank$region))
+# Create a barplot of customer region
+bank %>% ggplot(aes(x=region)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Region") + xlab("Region") + ylab("Count") + theme(plot.title = element_text(hjust=0.5))
+# Create a bar chart of customer region separated by whether they bought a PEP
+bank %>% ggplot(aes(x=region, fill=pep)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Region") + xlab("Region") + ylab("Count") + theme(plot.title = element_text(hjust=0.5))
+# Create a bar chart of customer region separated by whether they bought a PEP
+bank %>% ggplot(aes(x=region, fill=age)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Region") + xlab("Region") + ylab("Count") + theme(plot.title = element_text(hjust=0.5))
+```
+
+Income
+```{r}
+# Get a summary of customer income
+summary(bank$income)
+# Get percentages for each category
+summary(bank$income)/sum(summary(bank$income))
+# Create a barplot of customer income
+bank %>% ggplot(aes(x=income)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Income") + xlab("Income") + ylab("Count") + 
+  theme(plot.title = element_text(hjust=0.5), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+# Create a bar chart of customer income separated by whether they bought a PEP
+bank %>% ggplot(aes(x=income, fill=pep)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Income") + xlab("Income") + ylab("Count") + 
+  theme(plot.title = element_text(hjust=0.5), axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+```
+
+Married
+```{r}
+# Get a summary of customer married
+summary(bank$married)
+# Get percentages for each category
+summary(bank$married)/sum(summary(bank$married))
+# Create a barplot of customer married
+bank %>% ggplot(aes(x=married)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Marriage Status") + xlab("Marriage Status") + ylab("Count") + 
+  theme(plot.title = element_text(hjust=0.5))
+# Create a bar chart of customer married separated by whether they bought a PEP
+bank %>% ggplot(aes(x=married, fill=pep)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Marriage Status") + xlab("Marriage Status") + ylab("Count") + 
+  theme(plot.title = element_text(hjust=0.5))
+```
+
+
+Children
+```{r}
+# Get a summary of customer children
+summary(bank$children)
+# Get percentages for each category
+summary(bank$children)/sum(summary(bank$children))
+# Create a barplot of customer children
+bank %>% ggplot(aes(x=children)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Children") + xlab("# of Children") + ylab("Count") + 
+  theme(plot.title = element_text(hjust=0.5))
+# Create a bar chart of customer children separated by whether they bought a PEP
+bank %>% ggplot(aes(x=children, fill=pep)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Children") + xlab("# of Children") + ylab("Count") + 
+  theme(plot.title = element_text(hjust=0.5))
+```
+
+
+Car
+```{r}
+# Get a summary of customer car
+summary(bank$car)
+# Get percentages for each category
+summary(bank$car)/sum(summary(bank$car))
+# Create a barplot of customer car
+bank %>% ggplot(aes(x=car)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Car Ownership") + xlab("Owns a Car") + ylab("Count") + 
+  theme(plot.title = element_text(hjust=0.5))
+# Create a bar chart of customer car separated by whether they bought a PEP
+bank %>% ggplot(aes(x=car, fill=pep)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Car Ownership") + xlab("Owns a Car") + ylab("Count") + 
+  theme(plot.title = element_text(hjust=0.5))
+```
+
+
+Save_act
+```{r}
+# Get a summary of customer save_act
+summary(bank$save_act)
+# Get percentages for each category
+summary(bank$save_act)/sum(summary(bank$save_act))
+# Create a barplot of customer save_act
+bank %>% ggplot(aes(x=save_act)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Savings Account") + xlab("Has Savings Account") + ylab("Count") + 
+  theme(plot.title = element_text(hjust=0.5))
+# Create a bar chart of customer save_act separated by whether they bought a PEP
+bank %>% ggplot(aes(x=save_act, fill=pep)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Savings Account") + xlab("Has Savings Account") + ylab("Count") + 
+  theme(plot.title = element_text(hjust=0.5))
+```
+
+
+Current_act
+```{r}
+# Get a summary of customer current_act
+summary(bank$current_act)
+# Get percentages for each category
+summary(bank$current_act)/sum(summary(bank$current_act))
+# Create a barplot of customer current_act
+bank %>% ggplot(aes(x=current_act)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Current Account") + xlab("Has Current Account") + ylab("Count") + 
+  theme(plot.title = element_text(hjust=0.5))
+# Create a bar chart of customer current_act separated by whether they bought a PEP
+bank %>% ggplot(aes(x=current_act, fill=pep)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Current Account") + xlab("Has Current Account") + ylab("Count") + 
+  theme(plot.title = element_text(hjust=0.5))
+```
+
+
+
+Mortgage
+```{r}
+# Get a summary of customer mortgage
+summary(bank$mortgage)
+# Get percentages for each category
+summary(bank$mortgage)/sum(summary(bank$mortgage))
+# Create a barplot of customer mortgage
+bank %>% ggplot(aes(x=mortgage)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Mortgage") + xlab("Has Mortgage") + ylab("Count") + 
+  theme(plot.title = element_text(hjust=0.5))
+# Create a bar chart of customer mortgage separated by whether they bought a PEP
+bank %>% ggplot(aes(x=mortgage, fill=pep)) + geom_bar(position="dodge") + 
+  ggtitle("Customer Mortgage") + xlab("Has Mortgage") + ylab("Count") + 
+  theme(plot.title = element_text(hjust=0.5))
+```
+
+
+
+Pep
+```{r}
+# Get a summary of customer pep
+summary(bank$pep)
+# Get percentages for each category
+summary(bank$pep)/sum(summary(bank$pep))
+# Create a barplot of customer pep
+bank %>% ggplot(aes(x=pep)) + geom_bar(position="dodge") + 
+  ggtitle("Customer PEP Sales") + xlab("Bought PEP") + ylab("Count") + 
+  theme(plot.title = element_text(hjust=0.5))
+```
+
+# Association Rule Mining
+
+
+```{r}
+# Load the libraries
+library(arules)
+library(arulesViz)
+library(datasets)
+```
+
+```{r}
+# Create an item frequency plot for the top 20 items
+transactions <- as(bank, "transactions")
+itemFrequencyPlot(transactions, topN=20, type="absolute")
+```
+
+```{r}
+# Get the rules
+rules <- apriori(bank, parameter=list(supp = 0.005, conf=0.8))
+# Sort the rules
+rules<-sort(rules, by="lift", decreasing=TRUE)
+# Inspect the top 20 rules 
+inspect(rules[1:20])
+# Visualize the rules in a map
+plot(rules[1:20],method="graph", shading=NULL)
+```
+
+
+
+
+
+
+## ARM with PEP set on the right hand side
+
+```{r}
+# Get the rules
+rules<-apriori(data=bank, parameter=list(supp=0.002,conf = 0.8), 
+               appearance = list(default="lhs",rhs="pep=YES"),
+               control = list(verbose=F))
+# Sort the rules
+rules<-sort(rules, decreasing=TRUE,by="lift")
+# Inspect the top 20 rules 
+inspect(rules[1:20])
+# Visualize the rules in a map
+plot(rules[1:20],method="graph", shading=NULL)
+```
+
+```{r}
+# Inspect the top 20 rules 
+inspect(rules[1:20])
+```
+
